@@ -1,0 +1,19 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.formatOnSave": true,
+  "tslint.autoFixOnSave": false,
+  "[typescript]": {
+    "editor.formatOnSave": false,
+    "editor.codeActionsOnSave": [
+      "source.organizeImports",
+      "source.fixAll.eslint"
+    ]
+  },
+  "[typescriptreact]": {
+    "editor.formatOnSave": false,
+    "editor.codeActionsOnSave": [
+      "source.organizeImports",
+      "source.fixAll.eslint"
+    ]
+  }
+}

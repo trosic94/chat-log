@@ -1,0 +1,67 @@
+version: "3.7"
+
+services:
+  install:
+    image: node:16
+    command: yarn install
+    working_dir: /node
+    volumes:
+      - .:/node
+      - node_modules:/node/node_modules
+
+  frontend:
+    image: node:16
+    command: yarn frontend
+    working_dir: /node
+    ports:
+      - 80
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`localhost`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+    volumes:
+      - .:/node
+      - node_modules:/node/node_modules
+    depends_on:
+      install:
+        condition: service_completed_successfully
+
+  backend:
+    image: node:16
+    command: yarn backend
+    working_dir: /node
+    ports:
+      - 80
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`localhost`)"
+      - "traefik.http.routers.backend.rule=PathPrefix(`/api`)"
+      - "traefik.http.routers.backend.entrypoints=web"
+    volumes:
+      - .:/node
+      - node_modules:/node/node_modules
+    depends_on:
+      install:
+        condition: service_completed_successfully
+
+  postgres:
+    image: postgres:13
+    environment:
+      - POSTGRES_PASSWORD=password
+    ports:
+      - 5432:5432
+
+  traefik:
+    image: "traefik"
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+volumes:
+  node_modules:
