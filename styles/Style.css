@@ -1,0 +1,64 @@
+.searchForm input[type=text] {
+    padding: 10px;
+    margin: 10px;
+    font-size: 17px;
+    max-width: 200px;
+    border: 1px solid grey;
+    float: left;
+    width: 80%;
+}
+
+.searchForm button {
+    float: left;
+    padding: 10px;
+    margin: 10px;
+    background: #2196F3;
+    color: white;
+    font-size: 17px;
+    border: 1px solid grey;
+    border-left: none;
+    cursor: pointer;
+    width: 80px;
+}
+
+.searchForm button:hover {
+    background: #0b7dda;
+}
+
+.searchForm::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+
+.scrollTable {
+    /* overflow: hidden; */
+    overflow-y: scroll;
+    height: 700px;
+    margin-top: 10px;
+}
+
+.scrollTable table {
+    width: 100%;
+}
+
+.scrollTable table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.scrollTable table tr:hover {
+    background-color: #39ff32;
+}
+
+.scrollTable th {
+    position: sticky;
+    z-index: 2;
+    background-color: #39ff32;
+    padding: 10px;
+    top: 0;
+}
+
+.scrollTable thead {
+    background-color: #39ff32;
+}

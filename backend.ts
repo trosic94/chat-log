@@ -48,12 +48,22 @@ async function start() {
       // english chat room
       query: `subscription {
         chatMessages(chatId: "f0326994-ee9e-411c-8439-b4997c187b95") {
-          createdAt
-          data {
-            ... on ChatMessageDataText {
-              message
+            createdAt
+            id
+            data {
+              ... on ChatMessageDataText {
+                message
+              },
+              ... on ChatMessageDataTip {
+                messageTip : message
+                tip{
+                  id
+                }
+              }
             }
-          }
+            user{
+              name
+            }
         }
       }`,
     },
@@ -62,6 +72,8 @@ async function start() {
         type Message = {
           createdAt: string;
           data: null | { message: string };
+          id: string;
+          user: null | {name: string};
         };
 
         const message = data.data.chatMessages as Message;
@@ -71,7 +83,11 @@ async function start() {
         await knex("message").insert({
           message: message.data.message,
           created_at: new Date(message.createdAt),
+          id : message.id,
+          user : message.user.name 
         });
+
+        //client.dispose();
       },
       error(error) {
         console.log("subscriptionError", error);
@@ -88,6 +104,23 @@ async function start() {
       .limit(1);
 
     res.json(lastMessage);
+  });
+
+  router.get("/search-message", async (_req, res) => {
+    let word,user;
+    (_req.query.searchQuery ? (word = _req.query.searchQuery) : (word = ''));
+    (_req.query.searchUser ? (user = _req.query.searchUser) : (user = ''));
+    const searchMessage = await knex("message as m").select(knex.raw("to_char(created_at,'dd.mm.yyyy hh24:mi:ss') as datecreated,message,m.user,id"))
+      .where(function() {
+        this.whereRaw(`LOWER(m.message) LIKE LOWER(?)`, [`%${word}%`]).orWhereRaw(`'' LIKE LOWER(?)`, [`%${word}%`])
+      })
+      .where(function() {
+        this.whereRaw(`LOWER(m.user) LIKE LOWER(?)`, [`%${user}%`]).orWhereRaw(`'' LIKE LOWER(?)`, [`%${user}%`])
+      })
+      .orderBy("created_at", "desc")
+      .limit(10000);
+      
+    res.json(searchMessage);
   });
 }
 
